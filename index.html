@@ -335,7 +335,7 @@ footer code{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink
     <p><b>How the points work.</b> A win is 12 points, a draw 4, a defeat none. Slow-over-rate penalties are subtracted &mdash; type them into the <code>Pen</code> column. The deductions already handed down &mdash; England 14, Pakistan 8, West Indies 2 &mdash; are applied, and come back whenever you reset. Because teams are scheduled anything from 12 to 22 Tests, the table is ranked on PCT, the percentage of available points a side has actually won, exactly as the ICC does it.</p>
     <p><b>What PCT is measured against.</b> Only Tests that have a result &mdash; played or predicted &mdash; count toward a team's available points, so the table always reads like a live standings sheet. Once every remaining Test is scored, it becomes the finished cycle. Ties are broken on raw points, then wins.</p>
     <p><b>Series part-played.</b> Where a series has started but is not finished &mdash; Australia v Bangladesh and Sri Lanka v India &mdash; it stays in the list above with the played Test locked and only the remainder open to score. <i>Already in the book</i> below counts finished series only.</p>
-    <p><b>Sharing a scenario.</b> <b>Copy scenario</b> puts the whole prediction on the clipboard &mdash; as a link when the page is open in its own tab, otherwise as a short code. Either can be pasted into <b>Load scenario</b> to rebuild it exactly.</p>
+    <p><b>Sharing a scenario.</b> <b>Copy scenario</b> puts the whole prediction on the clipboard &mdash; as a link when the page is open in its own tab, otherwise as a short code. Either can be pasted into <b>Load scenario</b> to rebuild it exactly. Three Tests pack into each character, and anything left unscored is implied, so the address stays bare until you predict something and short after that. Only penalties you have changed yourself are carried.</p>
     <p><b>Reading the outlook.</b> The dark part of each bar is points already banked as a share of the whole cycle; the pale part is what is still winnable. A side is marked <b>out</b> only when at least two others have already banked more than it could ever reach, and <b>in</b> when fewer than two rivals could still pass it. This is a safe bound, not an exhaustive search: remaining fixtures are interlocked, so a team shown as alive may in truth need results that cannot all happen together.</p>
   </footer>
 </div>
@@ -601,46 +601,99 @@ function clearPredictions(){
   Object.keys(BASE_PEN).forEach(function(c){PEN[c]=BASE_PEN[c];});
 }
 
-function scenarioCode(){
-  var s="";
+// Each open Test is one of four states, so three of them pack into a single
+// URL-safe character. Trailing unscored Tests are implied and dropped, which
+// keeps a part-filled scenario down to a few characters.
+var B64="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_";
+var NUM={h:1,d:2,a:3};
+var CHR=[null,"h","d","a"];
+
+function packSlots(){
+  var v=[],out="",i;
   PENDING.forEach(function(x){
-    x.slots.forEach(function(v,i){ if(!x.fixed[i]) s+=v||"."; });
+    x.slots.forEach(function(s,j){ if(!x.fixed[j]) v.push(NUM[s]||0); });
   });
-  var p=Object.keys(PEN).filter(function(c){return PEN[c];})
-        .map(function(c){return c+":"+PEN[c];}).join(",");
-  return "s="+s+(p?"&p="+p:"");
+  for(i=0;i<v.length;i+=3){
+    out+=B64.charAt((v[i]<<4)|((v[i+1]||0)<<2)|(v[i+2]||0));
+  }
+  return out.replace(/0+$/,"");
+}
+
+function unpackSlots(str){
+  var v=[],i,c;
+  for(i=0;i<str.length;i++){
+    c=B64.indexOf(str.charAt(i));
+    if(c<0) return null;
+    v.push((c>>4)&3,(c>>2)&3,c&3);
+  }
+  while(v.length<TOTAL_SLOTS) v.push(0);
+  for(i=TOTAL_SLOTS;i<v.length;i++) if(v[i]) return null;
+  v.length=TOTAL_SLOTS;
+  return v;
+}
+
+// the plain one-character-per-Test form used by earlier links
+function plainSlots(str){
+  if(str.length!==TOTAL_SLOTS) return null;
+  var v=[],i;
+  for(i=0;i<str.length;i++) v.push(NUM[str.charAt(i)]||0);
+  return v;
+}
+
+function applySlots(v){
+  var k=0;
+  PENDING.forEach(function(x){
+    x.slots=x.slots.map(function(cur,i){ return x.fixed[i]?cur:CHR[v[k++]]; });
+  });
+}
+
+// only what differs from the deductions already handed down
+function packPen(){
+  var out=[];
+  Object.keys(NAMES).forEach(function(c){
+    if((PEN[c]||0)!==(BASE_PEN[c]||0)) out.push(c+":"+(PEN[c]||0));
+  });
+  return out.join(",");
+}
+
+function scenarioCode(){
+  var bits=[],q=packSlots(),p=packPen();
+  if(q) bits.push("q="+q);
+  if(p) bits.push("p="+p);
+  return bits.join("&");
 }
 
 function writeHash(){
+  var code=scenarioCode();
   // sandboxed frames can refuse history writes — the page must still render
-  try{ history.replaceState(null,"","#"+scenarioCode()); }catch(err){}
+  try{
+    history.replaceState(null,"", code ? "#"+code
+                                       : location.pathname+location.search);
+  }catch(err){}
 }
 
 // accepts a full link or a bare scenario code; returns true if anything loaded
 function loadScenario(str){
   if(!str) return false;
-  var h=String(str).trim();
+  var h=String(str).trim(),parts={},v;
   var hash=h.indexOf("#");
   if(hash>=0) h=h.slice(hash+1);
-  var parts={};
+  if(!h) return false;
   h.split("&").forEach(function(kv){
     var i=kv.indexOf("=");
     if(i>0) parts[kv.slice(0,i)]=decodeURIComponent(kv.slice(i+1));
   });
-  if(!parts.s || parts.s.length!==TOTAL_SLOTS) return false;
-  var k=0;
-  PENDING.forEach(function(x){
-    x.slots=x.slots.map(function(v,i){
-      if(x.fixed[i]) return v;
-      var c=parts.s.charAt(k++);
-      return c==="h"||c==="d"||c==="a" ? c : null;
-    });
-  });
+  if(parts.q!==undefined)      v=unpackSlots(parts.q);
+  else if(parts.s!==undefined) v=plainSlots(parts.s);
+  if(v===null) return false;                          // present but malformed
+  if(!v && parts.p===undefined) return false;         // nothing recognisable
+  if(v) applySlots(v);
   PEN={};
+  Object.keys(BASE_PEN).forEach(function(c){PEN[c]=BASE_PEN[c];});
   if(parts.p){
     parts.p.split(",").forEach(function(pair){
-      var bits=pair.split(":"),v=parseInt(bits[1],10);
-      if(NAMES[bits[0]] && isFinite(v) && v>0) PEN[bits[0]]=v;
+      var b=pair.split(":"),n=parseInt(b[1],10);
+      if(NAMES[b[0]] && isFinite(n) && n>=0) PEN[b[0]]=n;
     });
   }
   return true;
