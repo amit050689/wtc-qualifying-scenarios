@@ -1,0 +1,731 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>WTC Qualifying Scenarios</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Score the Tests left in the World Test Championship cycle and watch the points table redraw the qualification cut in real time.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%F0%9F%8F%8F</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..700&family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400..500&display=swap">
+
+<style>
+:root{
+  --ground:#E9EBE4;
+  --surface:#F7F8F4;
+  --surface-2:#DFE3D9;
+  --ink:#131A17;
+  --ink-2:#5B6660;
+  --ink-3:#8C958F;
+  --rule:#C9CFC4;
+  --rule-soft:#D9DED2;
+  --red:#B3271E;
+  --home:#1F5D52;
+  --away:#3E4F86;
+  --on-fill:#F7F8F4;
+  --draw-bg:#C9CFC4;
+  --shadow:0 1px 0 rgba(19,26,23,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F1512;
+    --surface:#171F1B;
+    --surface-2:#1F2A25;
+    --ink:#E8EDE7;
+    --ink-2:#9AA69F;
+    --ink-3:#6E7A74;
+    --rule:#2C3831;
+    --rule-soft:#232E28;
+    --red:#E2645A;
+    --home:#5FB9A4;
+    --away:#8FA4E4;
+    --on-fill:#0F1512;
+    --draw-bg:#333F38;
+    --shadow:0 1px 0 rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F1512;
+  --surface:#171F1B;
+  --surface-2:#1F2A25;
+  --ink:#E8EDE7;
+  --ink-2:#9AA69F;
+  --ink-3:#6E7A74;
+  --rule:#2C3831;
+  --rule-soft:#232E28;
+  --red:#E2645A;
+  --home:#5FB9A4;
+  --away:#8FA4E4;
+  --on-fill:#0F1512;
+  --draw-bg:#333F38;
+  --shadow:0 1px 0 rgba(0,0,0,.3);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:"Archivo","Helvetica Neue",Arial,sans-serif;
+  font-variation-settings:"wdth" 100;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1120px;margin:0 auto;padding:32px 20px 96px;display:flex;flex-direction:column;gap:40px}
+
+/* ---------- masthead ---------- */
+.masthead{display:flex;flex-direction:column;gap:14px;border-bottom:2px solid var(--ink);padding-bottom:18px}
+.eyebrow{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2);
+}
+h1{
+  margin:0;font-size:clamp(34px,6vw,58px);line-height:.94;font-weight:700;
+  font-variation-settings:"wdth" 84;letter-spacing:-.01em;text-wrap:balance;
+}
+.standfirst{
+  font-family:"Newsreader",Georgia,serif;font-size:17px;line-height:1.55;color:var(--ink-2);
+  max-width:62ch;margin:0;
+}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:4px}
+button{font-family:inherit;cursor:pointer}
+.btn{
+  border:1px solid var(--rule);background:var(--surface);color:var(--ink);
+  padding:8px 14px;border-radius:2px;font-size:12px;letter-spacing:.08em;
+  text-transform:uppercase;font-weight:600;font-variation-settings:"wdth" 90;
+  transition:background .12s ease,border-color .12s ease;
+}
+.btn:hover{background:var(--surface-2);border-color:var(--ink-3)}
+.btn.primary{background:var(--ink);color:var(--ground);border-color:var(--ink)}
+.btn.primary:hover{opacity:.86;background:var(--ink)}
+.counter{
+  margin-left:auto;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;
+  color:var(--ink-2);font-variant-numeric:tabular-nums;
+}
+.counter b{color:var(--ink);font-weight:600}
+
+/* ---------- sections ---------- */
+section{display:flex;flex-direction:column;gap:16px}
+.sec-head{display:flex;align-items:baseline;gap:14px;border-bottom:1px solid var(--rule);padding-bottom:8px}
+h2{
+  margin:0;font-size:15px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;
+  font-variation-settings:"wdth" 90;
+}
+.sec-note{
+  font-family:"Newsreader",Georgia,serif;font-size:14px;color:var(--ink-2);margin:0 0 0 auto;
+  text-align:right;
+}
+
+/* ---------- ledger table ---------- */
+.ledger{background:var(--surface);border:1px solid var(--rule);box-shadow:var(--shadow);overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:680px}
+thead th{
+  position:sticky;top:0;background:var(--surface);z-index:2;
+  font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2);
+  font-weight:600;text-align:right;padding:12px 10px;border-bottom:1px solid var(--ink);
+  white-space:nowrap;
+}
+thead th.l{text-align:left}
+tbody td{
+  padding:11px 10px;border-bottom:1px solid var(--rule-soft);text-align:right;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px;
+  font-variant-numeric:tabular-nums;color:var(--ink);
+}
+tbody td.pos{color:var(--ink-3);font-size:12px;text-align:left;width:34px}
+tbody td.team{text-align:left;font-family:"Archivo",sans-serif}
+.team-code{font-weight:700;font-size:15px;font-variation-settings:"wdth" 82;letter-spacing:.03em}
+.team-name{color:var(--ink-2);font-size:13px;margin-left:8px}
+tbody td.pts{font-weight:600}
+tbody td.pct{font-weight:600;font-size:15px;width:78px}
+tbody td.dim{color:var(--ink-3)}
+tr.qual td{background:color-mix(in srgb,var(--home) 8%,transparent)}
+tr.qual .team-code::after{
+  content:"Q";display:inline-block;margin-left:8px;font-family:"IBM Plex Mono",monospace;
+  font-size:10px;color:var(--home);border:1px solid var(--home);border-radius:2px;
+  padding:1px 4px;vertical-align:2px;font-weight:500;
+}
+tr.cut td{padding:0;border:0}
+.cutline{display:flex;align-items:center;gap:12px;padding:6px 10px;background:var(--surface)}
+.cutline .rule{flex:1;height:2px;background:var(--red)}
+.cutline span{
+  font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--red);white-space:nowrap;
+}
+input.pen{
+  width:52px;background:transparent;border:1px solid var(--rule);border-radius:2px;
+  color:var(--ink);font-family:"IBM Plex Mono",monospace;font-size:12px;padding:4px 6px;
+  text-align:right;font-variant-numeric:tabular-nums;
+}
+input.pen:hover{border-color:var(--ink-3)}
+input.pen:focus-visible,button:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+input.pen.on{border-color:var(--red);color:var(--red)}
+
+/* ---------- fixture cards ---------- */
+.fixtures{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px}
+.group-label{
+  grid-column:1/-1;display:flex;align-items:center;gap:12px;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink-3);
+}
+.group-label::after{content:"";flex:1;height:1px;background:var(--rule)}
+.fx{
+  background:var(--surface);border:1px solid var(--rule);box-shadow:var(--shadow);
+  padding:14px;display:flex;flex-direction:column;gap:12px;
+}
+.fx-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.fx-teams{font-weight:700;font-size:17px;font-variation-settings:"wdth" 84;letter-spacing:.02em}
+.fx-teams .v{color:var(--ink-3);font-weight:400;margin:0 6px;font-size:13px}
+.fx-when{
+  font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-3);white-space:nowrap;
+}
+.slots{display:flex;flex-wrap:wrap;gap:6px}
+.slot{
+  flex:1 1 58px;min-width:58px;height:38px;border-radius:2px;
+  border:1px dashed var(--rule);background:transparent;color:var(--ink-3);
+  font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;letter-spacing:.06em;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .08s ease,background .12s ease,color .12s ease,border-color .12s ease;
+}
+.slot:hover{border-color:var(--ink-3);color:var(--ink-2)}
+.slot:active{transform:scale(.96)}
+.slot.h{background:var(--home);border:1px solid var(--home);color:var(--on-fill)}
+.slot.a{background:var(--away);border:1px solid var(--away);color:var(--on-fill)}
+.slot.d{background:var(--draw-bg);border:1px solid var(--draw-bg);color:var(--ink)}
+/* already played: keeps full contrast, reads as set into the page */
+.slot.lock{cursor:default;box-shadow:inset 0 0 0 2px var(--surface)}
+.fx-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.score{
+  font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-2);
+  font-variant-numeric:tabular-nums;
+}
+.score b{color:var(--ink);font-weight:600}
+.presets{display:flex;gap:4px}
+.pre{
+  border:1px solid var(--rule-soft);background:transparent;color:var(--ink-2);
+  font-family:"IBM Plex Mono",monospace;font-size:10px;padding:3px 7px;border-radius:2px;
+  transition:border-color .12s ease,color .12s ease;
+}
+.pre:hover{border-color:var(--ink-3);color:var(--ink)}
+
+/* completed */
+.done{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.dn{
+  border:1px solid var(--rule-soft);background:transparent;padding:10px 12px;
+  display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+}
+.dn .n{font-weight:600;font-size:14px;font-variation-settings:"wdth" 86}
+.dn .r{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+
+/* ---------- outlook ---------- */
+.outlook{display:flex;flex-direction:column;gap:2px}
+.ol{
+  display:grid;grid-template-columns:112px 1fr 132px;gap:14px;align-items:center;
+  padding:10px 12px;border-bottom:1px solid var(--rule-soft);
+}
+.ol .who{display:flex;align-items:center;gap:8px}
+.ol .who b{font-size:14px;font-variation-settings:"wdth" 84;letter-spacing:.03em}
+.tag{
+  font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  padding:2px 5px;border-radius:2px;border:1px solid currentColor;
+}
+.tag.in{color:var(--home)}
+.tag.live{color:var(--ink-3)}
+.tag.out{color:var(--red)}
+.track{position:relative;height:10px;background:var(--rule-soft);border-radius:2px;overflow:hidden}
+.band{position:absolute;top:0;bottom:0;background:var(--rule);}
+.band.banked{background:var(--ink)}
+.ol.out .band.banked{background:var(--ink-3)}
+.ol .nums{
+  font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-2);text-align:right;
+  font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+.ol .nums b{color:var(--ink);font-weight:600}
+
+footer{
+  border-top:1px solid var(--rule);padding-top:16px;
+  font-family:"Newsreader",Georgia,serif;font-size:14px;line-height:1.6;color:var(--ink-2);
+  max-width:70ch;
+}
+footer p{margin:0 0 8px}
+footer code{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink)}
+.toast{
+  position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(8px);
+  background:var(--ink);color:var(--ground);padding:9px 18px;border-radius:2px;
+  font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.06em;
+  opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;z-index:20;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media (max-width:560px){
+  .ol{grid-template-columns:100px 1fr;row-gap:8px}
+  .ol .nums{grid-column:1/-1;text-align:left}
+  .sec-note{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="eyebrow">World Test Championship &middot; Nine teams &middot; 27 series</div>
+    <h1>WTC Qualifying Scenarios</h1>
+    <p class="standfirst">Results so far are already in the book. Score the Tests still to be played &mdash; click each square to cycle through home win, draw and away win &mdash; and the ledger recalculates who is ruled above the line for the final. Squares that are ringed have been played and cannot be changed.</p>
+    <div class="toolbar">
+      <button class="btn primary" id="share">Copy scenario</button>
+      <button class="btn" id="load">Load scenario</button>
+      <button class="btn" id="reset">Reset predictions</button>
+      <div class="counter"><b id="decided">0</b> of <b id="n-slots">0</b> Tests scored</div>
+    </div>
+  </header>
+
+  <section>
+    <div class="sec-head">
+      <h2>The Ledger</h2>
+      <p class="sec-note">Ranked by percentage of points won</p>
+    </div>
+    <div class="ledger">
+      <table>
+        <thead>
+          <tr>
+            <th class="l">#</th>
+            <th class="l">Team</th>
+            <th>Sched</th>
+            <th>Scored</th>
+            <th>W</th>
+            <th>L</th>
+            <th>D</th>
+            <th>Pts</th>
+            <th>Pen</th>
+            <th>PCT</th>
+          </tr>
+        </thead>
+        <tbody id="standings"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>Still To Be Scored</h2>
+      <p class="sec-note" id="n-open"></p>
+    </div>
+    <div class="fixtures" id="fixtures"></div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>Qualification Outlook</h2>
+      <p class="sec-note">Banked &rarr; ceiling, over the full cycle</p>
+    </div>
+    <div class="outlook" id="outlook"></div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>Already In The Book</h2>
+      <p class="sec-note" id="n-closed"></p>
+    </div>
+    <div class="done" id="completed"></div>
+  </section>
+
+  <footer>
+    <p><b>How the points work.</b> A win is 12 points, a draw 4, a defeat none. Slow-over-rate penalties are subtracted &mdash; type them into the <code>Pen</code> column. England's 14-point deduction is already applied and comes back whenever you reset. Because teams are scheduled anything from 12 to 22 Tests, the table is ranked on PCT, the percentage of available points a side has actually won, exactly as the ICC does it.</p>
+    <p><b>What PCT is measured against.</b> Only Tests that have a result &mdash; played or predicted &mdash; count toward a team's available points, so the table always reads like a live standings sheet. Once every remaining Test is scored, it becomes the finished cycle. Ties are broken on raw points, then wins.</p>
+    <p><b>Series part-played.</b> Where a series has started but is not finished &mdash; Australia v Bangladesh and Sri Lanka v India &mdash; it stays in the list above with the played Test locked and only the remainder open to score. <i>Already in the book</i> below counts finished series only.</p>
+    <p><b>Sharing a scenario.</b> <b>Copy scenario</b> puts the whole prediction on the clipboard &mdash; as a link when the page is open in its own tab, otherwise as a short code. Either can be pasted into <b>Load scenario</b> to rebuild it exactly.</p>
+    <p><b>Reading the outlook.</b> The dark part of each bar is points already banked as a share of the whole cycle; the pale part is what is still winnable. A side is marked <b>out</b> only when at least two others have already banked more than it could ever reach, and <b>in</b> when fewer than two rivals could still pass it. This is a safe bound, not an exhaustive search: remaining fixtures are interlocked, so a team shown as alive may in truth need results that cannot all happen together.</p>
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+
+var NAMES={AUS:"Australia",ENG:"England",IND:"India",NZ:"New Zealand",SA:"South Africa",
+           PAK:"Pakistan",SL:"Sri Lanka",BAN:"Bangladesh",WI:"West Indies"};
+
+// home, away, tests, results already in the book — one character per Test,
+// "h" home win, "a" away win, "d" draw. A short string means the rest of the
+// series is still to be played (e.g. AUS v BAN: BAN won the first, one left).
+var RAW=[
+  ["AUS","ENG",5,"hhhha"],
+  ["AUS","NZ", 4,""],
+  ["AUS","BAN",2,"a"],
+  ["ENG","IND",5,"hhaad"],
+  ["ENG","PAK",3,""],
+  ["ENG","NZ", 3,"haa"],
+  ["BAN","PAK",2,"hh"],
+  ["BAN","WI", 2,""],
+  ["BAN","ENG",2,""],
+  ["IND","AUS",5,""],
+  ["IND","WI", 2,"hh"],
+  ["IND","SA", 2,"aa"],
+  ["NZ", "WI", 3,"hhd"],
+  ["NZ", "SL", 2,""],
+  ["NZ", "IND",2,""],
+  ["PAK","NZ", 2,""],
+  ["PAK","SL", 2,""],
+  ["PAK","SA", 2,"ha"],
+  ["SA", "AUS",3,""],
+  ["SA", "BAN",2,""],
+  ["SA", "ENG",3,""],
+  ["SL", "BAN",2,"hd"],
+  ["SL", "IND",2,"a"],
+  ["SL", "SA", 2,""],
+  ["WI", "AUS",3,"aaa"],
+  ["WI", "PAK",2,"ha"],
+  ["WI", "SL", 2,"hd"]
+];
+
+// deductions already handed down, restored by Reset
+var BASE_PEN={ENG:14};
+
+var SERIES=RAW.map(function(r,i){
+  var s={id:i,home:r[0],away:r[1],n:r[2],slots:[],fixed:[],open:0},k,c,v;
+  for(k=0;k<s.n;k++){
+    c=(r[3]||"").charAt(k);
+    v=(c==="h"||c==="a"||c==="d")?c:null;
+    s.slots.push(v);
+    s.fixed.push(v!==null);
+    if(v===null) s.open++;
+  }
+  return s;
+});
+
+var PENDING=SERIES.filter(function(s){return s.open>0;});   // also the encode order
+var CLOSED =SERIES.filter(function(s){return s.open===0;});
+
+// the sides in the qualification argument lead the fixture list; a series is
+// ranked by the highest-placed team in it, ties keeping schedule order
+var LEAD=["AUS","SA","NZ","IND"];
+function rank(s){
+  var a=LEAD.indexOf(s.home),b=LEAD.indexOf(s.away);
+  return Math.min(a<0?99:a, b<0?99:b);
+}
+var DISPLAY=PENDING.map(function(s,i){return {s:s,r:rank(s),i:i};})
+  .sort(function(x,y){return x.r-y.r || x.i-y.i;})
+  .map(function(o){return o.s;});
+var TOTAL_SLOTS=PENDING.reduce(function(t,s){return t+s.open;},0);
+var PEN={};
+Object.keys(BASE_PEN).forEach(function(c){PEN[c]=BASE_PEN[c];});
+var CYCLE="hda";
+
+/* ------------------------------ scoring ------------------------------ */
+
+function compute(){
+  var T={},codes=Object.keys(NAMES);
+  codes.forEach(function(c){T[c]={code:c,sched:0,w:0,l:0,d:0,rem:0};});
+  SERIES.forEach(function(s){
+    T[s.home].sched+=s.n; T[s.away].sched+=s.n;
+    s.slots.forEach(function(v){
+      var H=T[s.home],A=T[s.away];
+      if(v==="h"){H.w++;A.l++;}
+      else if(v==="a"){A.w++;H.l++;}
+      else if(v==="d"){H.d++;A.d++;}
+      else {H.rem++;A.rem++;}
+    });
+  });
+  var rows=codes.map(function(c){
+    var t=T[c];
+    t.pen=PEN[c]||0;
+    t.scored=t.w+t.l+t.d;
+    t.pts=t.w*12+t.d*4;
+    t.net=t.pts-t.pen;
+    t.avail=t.scored*12;
+    t.pct=t.avail?(t.net/t.avail)*100:0;
+    t.full=t.sched*12;
+    t.floor=(t.net/t.full)*100;                    // banked, over the whole cycle
+    t.ceil=((t.net+t.rem*12)/t.full)*100;          // wins everything left
+    return t;
+  });
+  rows.sort(function(a,b){
+    return b.pct-a.pct || b.net-a.net || b.w-a.w || a.code.localeCompare(b.code);
+  });
+  rows.forEach(function(t){
+    var beat=0,pass=0;
+    rows.forEach(function(r){
+      if(r===t) return;
+      if(r.floor>t.ceil+1e-9) beat++;
+      if(r.ceil>t.floor+1e-9) pass++;
+    });
+    t.status = beat>=2 ? "out" : (pass<2 ? "in" : "live");
+  });
+  return rows;
+}
+
+/* ------------------------------ rendering ------------------------------ */
+
+var $=function(id){return document.getElementById(id);};
+
+function n1(x){return x.toFixed(1);}
+function n2(x){return x.toFixed(2);}
+
+function renderStandings(rows){
+  var html="";
+  rows.forEach(function(t,i){
+    if(i===2){
+      html+='<tr class="cut"><td colspan="10"><div class="cutline">'+
+            '<span>Qualification cut</span><div class="rule"></div>'+
+            '<span>Top two play the final</span></div></td></tr>';
+    }
+    html+='<tr class="'+(i<2?"qual":"")+'">'+
+      '<td class="pos">'+(i+1)+'</td>'+
+      '<td class="team"><span class="team-code">'+t.code+'</span>'+
+        '<span class="team-name">'+NAMES[t.code]+'</span></td>'+
+      '<td class="dim">'+t.sched+'</td>'+
+      '<td>'+t.scored+'</td>'+
+      '<td>'+t.w+'</td>'+
+      '<td>'+t.l+'</td>'+
+      '<td>'+t.d+'</td>'+
+      '<td class="pts">'+t.pts+'</td>'+
+      '<td><input class="pen'+(t.pen?" on":"")+'" type="text" inputmode="numeric" '+
+        'value="'+t.pen+'" data-team="'+t.code+'" aria-label="Penalty points for '+NAMES[t.code]+'"></td>'+
+      '<td class="pct">'+n2(t.pct)+'</td>'+
+    '</tr>';
+  });
+  $("standings").innerHTML=html;
+}
+
+function label(s,v,i){
+  if(v==="h") return s.home;
+  if(v==="a") return s.away;
+  if(v==="d") return "DRAW";
+  return "T"+(i+1);
+}
+
+function renderFixtures(){
+  var html="",group=null;
+  DISPLAY.forEach(function(s){
+    var g=rank(s)<99?0:1;
+    if(g!==group){
+      html+='<div class="group-label">'+
+            (g===0?"Aus &middot; SA &middot; NZ &middot; Ind":"Other series")+'</div>';
+      group=g;
+    }
+    var w=0,l=0,d=0,u=0;
+    s.slots.forEach(function(v){
+      if(v==="h")w++; else if(v==="a")l++; else if(v==="d")d++; else u++;
+    });
+    var slots="";
+    s.slots.forEach(function(v,i){
+      slots+= s.fixed[i]
+        ? '<button class="slot '+v+' lock" disabled title="Test '+(i+1)+
+          ' — already played">'+label(s,v,i)+'</button>'
+        : '<button class="slot '+(v||"")+'" data-s="'+s.id+'" data-i="'+i+'" '+
+          'title="Test '+(i+1)+' — click to cycle">'+label(s,v,i)+'</button>';
+    });
+    html+='<article class="fx">'+
+      '<div class="fx-head">'+
+        '<div class="fx-teams">'+s.home+'<span class="v">v</span>'+s.away+'</div>'+
+        '<div class="fx-when">'+(s.open<s.n?s.open+' of '+s.n+' left':s.n+' Tests')+'</div>'+
+      '</div>'+
+      '<div class="slots">'+slots+'</div>'+
+      '<div class="fx-foot">'+
+        '<div class="score">'+(u===s.n
+            ? "Not scored"
+            : '<b>'+s.home+' '+w+'&ndash;'+l+'</b>'+(d?' &middot; '+d+' drawn':'')+
+              (u?' &middot; '+u+' left':''))+'</div>'+
+        '<div class="presets">'+
+          '<button class="pre" data-fill="h" data-s="'+s.id+'" title="Give the rest to '+
+            NAMES[s.home]+'">'+s.home+'</button>'+
+          '<button class="pre" data-fill="d" data-s="'+s.id+'" title="Draw the rest">Draw</button>'+
+          '<button class="pre" data-fill="a" data-s="'+s.id+'" title="Give the rest to '+
+            NAMES[s.away]+'">'+s.away+'</button>'+
+          '<button class="pre" data-fill="x" data-s="'+s.id+'" title="Unscore this series">Clear</button>'+
+        '</div>'+
+      '</div>'+
+    '</article>';
+  });
+  $("fixtures").innerHTML=html;
+  $("n-open").innerHTML=PENDING.length+" series &middot; "+TOTAL_SLOTS+" Tests to score";
+}
+
+function renderOutlook(rows){
+  var html="";
+  var word={in:"In",live:"Alive",out:"Out"};
+  rows.forEach(function(t){
+    html+='<div class="ol '+t.status+'">'+
+      '<div class="who"><b>'+t.code+'</b><span class="tag '+t.status+'">'+word[t.status]+'</span></div>'+
+      '<div class="track">'+
+        '<div class="band" style="left:'+n1(t.floor)+'%;width:'+n1(t.ceil-t.floor)+'%"></div>'+
+        '<div class="band banked" style="left:0;width:'+n1(t.floor)+'%"></div>'+
+      '</div>'+
+      '<div class="nums"><b>'+n1(t.floor)+'</b> &rarr; <b>'+n1(t.ceil)+'</b>'+
+        '<span> &middot; '+(t.rem*12)+' left</span></div>'+
+    '</div>';
+  });
+  $("outlook").innerHTML=html;
+}
+
+function renderCompleted(){
+  var html="",tests=0;
+  CLOSED.forEach(function(s){
+    var w=0,l=0,d=0;
+    tests+=s.n;
+    s.slots.forEach(function(v){if(v==="h")w++;else if(v==="a")l++;else d++;});
+    html+='<div class="dn"><span class="n">'+s.home+' v '+s.away+'</span>'+
+          '<span class="r">'+w+'&ndash;'+l+(d?" ("+d+"d)":"")+'</span></div>';
+  });
+  $("completed").innerHTML=html;
+  $("n-closed").innerHTML=CLOSED.length+" series &middot; "+tests+" Tests";
+}
+
+function decidedCount(){
+  var n=0;
+  PENDING.forEach(function(s){s.slots.forEach(function(v){if(v)n++;});});
+  return n;
+}
+
+function render(){
+  var rows=compute();
+  renderStandings(rows);
+  renderFixtures();
+  renderOutlook(rows);
+  $("decided").textContent=decidedCount();
+  $("n-slots").textContent=TOTAL_SLOTS;
+  writeHash();
+}
+
+/* ------------------------------ scenario in the URL ------------------------------ */
+
+function clearPredictions(){
+  PENDING.forEach(function(x){
+    x.slots=x.slots.map(function(v,i){return x.fixed[i]?v:null;});
+  });
+  PEN={};
+  Object.keys(BASE_PEN).forEach(function(c){PEN[c]=BASE_PEN[c];});
+}
+
+function scenarioCode(){
+  var s="";
+  PENDING.forEach(function(x){
+    x.slots.forEach(function(v,i){ if(!x.fixed[i]) s+=v||"."; });
+  });
+  var p=Object.keys(PEN).filter(function(c){return PEN[c];})
+        .map(function(c){return c+":"+PEN[c];}).join(",");
+  return "s="+s+(p?"&p="+p:"");
+}
+
+function writeHash(){
+  // sandboxed frames can refuse history writes — the page must still render
+  try{ history.replaceState(null,"","#"+scenarioCode()); }catch(err){}
+}
+
+// accepts a full link or a bare scenario code; returns true if anything loaded
+function loadScenario(str){
+  if(!str) return false;
+  var h=String(str).trim();
+  var hash=h.indexOf("#");
+  if(hash>=0) h=h.slice(hash+1);
+  var parts={};
+  h.split("&").forEach(function(kv){
+    var i=kv.indexOf("=");
+    if(i>0) parts[kv.slice(0,i)]=decodeURIComponent(kv.slice(i+1));
+  });
+  if(!parts.s || parts.s.length!==TOTAL_SLOTS) return false;
+  var k=0;
+  PENDING.forEach(function(x){
+    x.slots=x.slots.map(function(v,i){
+      if(x.fixed[i]) return v;
+      var c=parts.s.charAt(k++);
+      return c==="h"||c==="d"||c==="a" ? c : null;
+    });
+  });
+  PEN={};
+  if(parts.p){
+    parts.p.split(",").forEach(function(pair){
+      var bits=pair.split(":"),v=parseInt(bits[1],10);
+      if(NAMES[bits[0]] && isFinite(v) && v>0) PEN[bits[0]]=v;
+    });
+  }
+  return true;
+}
+
+/* ------------------------------ interaction ------------------------------ */
+
+function toast(msg){
+  var el=$("toast");
+  el.textContent=msg;
+  el.classList.add("show");
+  clearTimeout(toast._t);
+  toast._t=setTimeout(function(){el.classList.remove("show");},1900);
+}
+
+document.addEventListener("click",function(e){
+  var slot=e.target.closest(".slot");
+  if(slot && !slot.disabled){
+    var s=SERIES[+slot.dataset.s],i=+slot.dataset.i,cur=s.slots[i];
+    if(s.fixed[i]) return;
+    var next=cur===null?"h":(CYCLE.indexOf(cur)===2?null:CYCLE.charAt(CYCLE.indexOf(cur)+1));
+    s.slots[i]=next;
+    render();
+    return;
+  }
+  var pre=e.target.closest(".pre");
+  if(pre){
+    var sr=SERIES[+pre.dataset.s],f=pre.dataset.fill;
+    sr.slots=sr.slots.map(function(v,i){
+      return sr.fixed[i] ? v : (f==="x"?null:f);   // never overwrite a played Test
+    });
+    render();
+    return;
+  }
+  if(e.target.id==="reset"){
+    clearPredictions();
+    render();
+    toast("Predictions cleared");
+    return;
+  }
+  if(e.target.id==="load"){
+    var pasted=prompt("Paste a scenario link or code");
+    if(pasted===null) return;
+    if(loadScenario(pasted)){ render(); toast("Scenario loaded"); }
+    else toast("That is not a valid scenario code");
+    return;
+  }
+  if(e.target.id==="share"){
+    writeHash();
+    // inside a sandboxed frame the frame's own URL is useless to a reader,
+    // so hand over the portable code instead
+    var framed=true;
+    try{ framed = window.top !== window.self; }catch(err){}
+    var payload = framed ? scenarioCode() : location.href;
+    var okMsg   = framed ? "Scenario code copied" : "Scenario link copied";
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(payload).then(
+        function(){toast(okMsg);},
+        function(){toast("Copy blocked by the browser");}
+      );
+    } else {
+      toast("Copy is unavailable in this browser");
+    }
+  }
+});
+
+document.addEventListener("input",function(e){
+  if(!e.target.classList.contains("pen")) return;
+  var code=e.target.dataset.team,v=parseInt(e.target.value,10);
+  PEN[code]=isFinite(v)&&v>0?v:0;
+  var rows=compute();
+  renderStandings(rows);
+  renderOutlook(rows);
+  writeHash();
+  var again=document.querySelector('.pen[data-team="'+code+'"]');
+  if(again){
+    again.focus();
+    try{ again.setSelectionRange(again.value.length,again.value.length); }catch(err){}
+  }
+});
+
+loadScenario(location.hash);
+renderCompleted();
+render();
+})();
+</script>
+</body>
+</html>
