@@ -79,7 +79,10 @@ body{
 .eyebrow{
   font-family:"IBM Plex Mono",ui-monospace,monospace;
   font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2);
+  display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;
 }
+.stamp{color:var(--ink-3);border-left:1px solid var(--rule);padding-left:10px}
+.stamp b{color:var(--ink-2);font-weight:500}
 h1{
   margin:0;font-size:clamp(34px,6vw,58px);line-height:.94;font-weight:700;
   font-variation-settings:"wdth" 84;letter-spacing:-.01em;text-wrap:balance;
@@ -270,7 +273,9 @@ footer code{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink
 <div class="wrap">
 
   <header class="masthead">
-    <div class="eyebrow">World Test Championship &middot; Nine teams &middot; 27 series</div>
+    <div class="eyebrow">World Test Championship &middot; Nine teams &middot; 27 series
+      <span class="stamp">Results to <b id="updated"></b></span>
+    </div>
     <h1>WTC Qualifying Scenarios</h1>
     <p class="standfirst">Results so far are already in the book. Score the Tests still to be played &mdash; click each square to cycle through home win, draw and away win &mdash; and the ledger recalculates who is ruled above the line for the final. Squares that are ringed have been played and cannot be changed.</p>
     <div class="toolbar">
@@ -384,6 +389,10 @@ var RAW=[
 
 // deductions already handed down, restored by Reset
 var BASE_PEN={ENG:14,PAK:8,WI:2};
+
+// bump whenever a result is locked in — GitHub Pages caches the page for ten
+// minutes, so this is how you tell a stale tab from a current one
+var UPDATED="23 August 2026";
 
 var SERIES=RAW.map(function(r,i){
   var s={id:i,home:r[0],away:r[1],n:r[2],slots:[],fixed:[],open:0},k,c,v;
@@ -775,6 +784,7 @@ document.addEventListener("input",function(e){
   }
 });
 
+$("updated").textContent=UPDATED;
 loadScenario(location.hash);
 renderCompleted();
 render();
