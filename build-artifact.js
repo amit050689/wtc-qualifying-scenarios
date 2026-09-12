@@ -29,3 +29,9 @@ if (!/<title>/.test(out)) throw new Error("title went missing");
 
 fs.writeFileSync(path.join(dir, "artifact.html"), out.trim() + "\n");
 console.log("artifact.html written —", out.length, "bytes");
+
+// version.json is what a cached tab polls to discover it has gone stale
+const build = (src.match(/var BUILD="([^"]+)"/) || [])[1];
+if (!build) throw new Error("no BUILD constant found in index.html");
+fs.writeFileSync(path.join(dir, "version.json"), JSON.stringify({ build }) + "\n");
+console.log("version.json written — build", build);
