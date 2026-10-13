@@ -392,7 +392,7 @@ var RAW=[
   ["PAK","NZ", 2,""],
   ["PAK","SL", 2,""],
   ["PAK","SA", 2,"ha"],
-  ["SA", "AUS",3,""],
+  ["SA", "AUS",3,"a"],
   ["SA", "BAN",2,""],
   ["SA", "ENG",3,""],
   ["SL", "BAN",2,"hd"],
@@ -408,11 +408,11 @@ var BASE_PEN={ENG:14,PAK:8,WI:2};
 
 // bump whenever a result is locked in — GitHub Pages caches the page for ten
 // minutes, so this is how you tell a stale tab from a current one
-var UPDATED="12 September 2026";
+var UPDATED="13 October 2026";
 
 // Bump on every ship. build-artifact.js copies this into version.json, which
 // the page re-checks at runtime so a cached tab can tell it has gone stale.
-var BUILD="2026-09-12b";
+var BUILD="2026-10-13a";
 
 var SERIES=RAW.map(function(r,i){
   var s={id:i,home:r[0],away:r[1],n:r[2],slots:[],fixed:[],open:0},k,c,v;
